@@ -1,0 +1,30 @@
+
+#include "bPlayer.h"
+
+Player::Player() : Entity(){ 
+    X = 0.0f;
+	Y = 0.0f;
+ 
+    Width = Height = 0;
+
+    AnimState = 0;
+}
+ 
+Player::~Player() {}
+ 
+void Player::move(bool limit)
+{
+  if(limit)
+  {
+	  X = 0;
+	  Y+=5;
+  }
+  else
+  {
+	 X = 0;
+	 Y = 0;
+  }
+  
+ 
+}
+
