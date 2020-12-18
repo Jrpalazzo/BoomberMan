@@ -12,7 +12,7 @@ class InputManager
 
 		~InputManager();
 
-		bool mainInputs(bool runState, Player &player, SDL_Window* window, bool &guitarFlag);
+		bool mainInputs(bool runState, SDL_Window* window, bool &guitarFlag);
 
 	private:
 		//Event handler

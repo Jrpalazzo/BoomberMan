@@ -3,47 +3,49 @@
 
 Player::Player() 
 { 
-	X = 64;
-	Y = 128;
-
-	mCollider.x = 64;
-	mCollider.y = 64;
-
-	mCollider.w = Width;
-	mCollider.h = Height;
-
-    pVelX = 0;
-    pVelY = 0;
-	
 	yPrev = 0;
 	xPrev = 0;
 
+	nCollider.w = Width;
+	nCollider.h = Height;
+
+	mCollider.x = X;
+	mCollider.y = Y;
+
+	mCollider.w = Width;
+	mCollider.h = Height;
+	
     frame = 11; 
 
-	pSpeed = 3;
+	timer.start();
+
+	pSpeed =3;
 
 	inputCounter = 0;
 
 	setAnimationClips(); 
 
-	timerStart = false;
-
-	timer.start();
-
 	direction = NONE;
-    //inputTimer.start();
 
+	collided = false;
+
+	state = "alive";
 }
  
 Player::~Player() {}
-/*
-void Player::playerInput(const Uint8* keys, std::vector<Block*> blocks, SDL_Rect guitarRect, bool &guitarFlag, Guitar &guitar, bool &explosionFlag)
+
+
+void Player::playerInput(const Uint8* keys, std::vector<Block*> blocks, std::vector<Enemy*> enemies,
+	SDL_Rect guitarRect, bool &guitarFlag, Guitar &guitar, bool &explosionFlag, SDL_Rect& camera)
 {
+	//int xPrev, yPrev;
 
 	SDL_PumpEvents();
 
 	resumeInput = inputTimer.getTicks()/250; 
 	resumeInput = resumeInput%12;
+
+	int curentBlockType;
 
 	if((!inputTimer.isStarted()) && guitarFlag == true){
 		
@@ -51,41 +53,52 @@ void Player::playerInput(const Uint8* keys, std::vector<Block*> blocks, SDL_Rect
 
 		inputTimer.start();
 			
-		std::cout << "direction " << direction << std::endl;
-		std::cout << "playerX " << X << " playerY " << X << " setX " << X - ( X % 64) << " setY " << Y - ( Y % 64) << std::endl; 
+		//std::cout << "direction " << direction << std::endl;
+		//std::cout << "playerX " << X << " playerY " << X << " setX " << X - ( X % 64) << " setY " << Y - ( Y % 64) << std::endl; 
 
-		guitar.setX(X - (X % 64));
-		guitar.setY(Y - (Y % 64));
+		guitar.setX(X);
+		guitar.setY(Y);
 
 		if(direction == UP)
-		{
+	    {
 			guitar.setX(X - (X % 64));
+		
 			guitar.setY(Y - (Y % 64)+64);
 
-			if(direction == NONE)
-			{
+			if(direction == NONE){
 				guitar.setY(Y - (Y % 64));
+			}
+			
+		}
+		else if(direction == DOWN)
+		{
+			guitar.setX(X - (X % 64));
+			guitar.setY(Y - (Y % 64));
 
+			if(direction == NONE){
+				guitar.setY(Y - (Y % 64)-64);
+			}
+		}
+		else if(direction == RIGHT)
+		{
+
+			guitar.setX(X - (X % 64));
+			guitar.setY(Y - (Y % 64));
+
+			if(direction == NONE){
+				guitar.setX(X - (X % 64)+64);
 			}
 		}
 		else if(direction == LEFT)
 		{
-			guitar.setY(Y - (Y % 64));
-			guitar.setX(X - (X % 64)+64);
-
-			if(direction == NONE)
-			{
-				guitar.setX(X - (X % 64));
-
-			}
-		}
-		else 
-		{
 			guitar.setX(X - (X % 64));
 			guitar.setY(Y - (Y % 64));
-		}
-	
 
+			if(direction == NONE){
+				guitar.setX(X - (X % 64)-64);
+			}
+		}
+		
 	}
 	
 
@@ -99,222 +112,249 @@ void Player::playerInput(const Uint8* keys, std::vector<Block*> blocks, SDL_Rect
 		//std::cout << "playerX " << X << " playerY " << Y << " guitarX " << guitar.getX() << " guitarY " << guitar.getY() << std::endl; 
 	}
 
-	if(keys[SDL_SCANCODE_UP]){
-		yPrev = Y;
-		Y -= pSpeed;
-		mCollider.y = Y; 
-
-		frame = 4;
-		unPauseAnimationTimer();
-
-		direction = UP;
-
-		if(checkBlockCollision(mCollider, blocks))
-		{
-			if(mCollider.x < curBlock.x - 28)
-			{
-				X -= pSpeed;
-				mCollider.x = X; 
-			}
-			else if(mCollider.x > curBlock.x  + 28)
-			{
-				X += pSpeed;
-				mCollider.x = X; 
-			}
-
-			Y = yPrev;
+	
+		if(keys[SDL_SCANCODE_UP]){
+			yPrev = Y;
+			Y -= pSpeed;
 			mCollider.y = Y; 
-			direction = NONE;
 
-		}
+			frame = 4;
+			unPauseAnimationTimer();
 
-		if(checkCollision(mCollider, guitarRect))
-		{
-			if(Y > guitarRect.y)
+			direction = UP;
+
+			if(checkBlockCollision(mCollider, blocks, curentBlockType))
 			{
-				Y = yPrev;
-				mCollider.y = Y; 
-				direction = NONE;
+
+				if((mCollider.x < curBlock.x -40) && curentBlockType == 3 && !isMovefree(blocks, curBlock.x-64, curBlock.y))
+				{
+					X -= 1;
+					mCollider.x = X;
+					
+				}
+				else if((mCollider.x > curBlock.x +40) && curentBlockType == 3 && !isMovefree(blocks, curBlock.x+64, curBlock.y))
+				{
+					X += 1;;
+					mCollider.x = X;
+					
+				}
+				else
+				{
+					Y = yPrev;
+					mCollider.y = Y; 
+					direction = NONE;
+				}
+
+
+			}
+
+			if(checkCollision(mCollider, guitarRect))
+			{
+				if(Y > guitarRect.y)
+				{
+					Y = yPrev;
+					mCollider.y = Y; 
+					direction = NONE;
+
+				}
+
+			}
+
+			for(int i = 0; i < enemies.size(); ++i)
+			{
+				if(checkCollision(mCollider, enemies[i]->getCollider()))
+				{
+					state = "dead";
+				}
 
 			}
 
 		}
 
-	}
-
-	if(keys[SDL_SCANCODE_DOWN]){
-		yPrev = Y;
-		Y += pSpeed;
-		mCollider.y = Y; 
-		frame = 1;
-		unPauseAnimationTimer();
-
-		direction = DOWN;
-
-		if(checkBlockCollision(mCollider, blocks))
-		{
-			if(mCollider.x < curBlock.x -28)
-			{
-				X -= pSpeed;
-				mCollider.x = X; 
-			}
-			else if(mCollider.x > curBlock.x +28)
-			{
-				X += pSpeed;
-				mCollider.x = X; 
-			}
-
-			Y = yPrev;
+		if(keys[SDL_SCANCODE_DOWN]){
+			yPrev = Y;
+			Y += pSpeed;
 			mCollider.y = Y; 
-			direction = NONE;
-		}
+			frame = 1;
+			unPauseAnimationTimer();
+
+			direction = DOWN;
+
+			if(checkBlockCollision(mCollider, blocks, curentBlockType))
+			{
+				//std::cout<<curentBlockType<<std::endl;
+
+				if((mCollider.x < curBlock.x -40) && curentBlockType == 3 && !isMovefree(blocks, curBlock.x-64, curBlock.y))
+				{
+					X -= 1;
+					mCollider.x = X;
+				
+				}
+				else if((mCollider.x > curBlock.x +40) && curentBlockType == 3 && !isMovefree(blocks, curBlock.x+64, curBlock.y))
+				{
+					
+					X += 1;
+					mCollider.x = X;
+					
+				}
+				else
+				{
+					Y = yPrev;
+					mCollider.y = Y;
+					direction = NONE;
+				}
+				
+			}
 
 		
-		if(checkCollision(mCollider, guitarRect))
-		{
-			if(Y < guitarRect.y)
+			if(checkCollision(mCollider, guitarRect))
 			{
-				Y = yPrev;
-				mCollider.y = Y; 
-				direction = NONE;
+				if(Y < guitarRect.y)
+				{
+					Y = yPrev;
+					mCollider.y = Y; 
+					direction = NONE;
+
+				}
+
+			}
+			for(int i = 0; i < enemies.size(); ++i)
+			{
+				if(checkCollision(mCollider, enemies[i]->getCollider()))
+				{
+					state = "dead";
+				}
+
+			}
+		}
+
+		if(keys[SDL_SCANCODE_LEFT]){
+			xPrev = X;
+			X -= pSpeed;
+			mCollider.x = X;
+			frame = 10;
+			unPauseAnimationTimer();
+
+			direction = LEFT;
+
+			if(checkBlockCollision(mCollider, blocks, curentBlockType))
+			{
+				if((mCollider.y < curBlock.y -40) && curentBlockType == 3 && !isMovefree(blocks, curBlock.x, curBlock.y-64))
+				{
+					
+					Y -= 1;
+					mCollider.y = Y; 
+				
+					
+				}
+				else if((mCollider.y > curBlock.y +40) && curentBlockType == 3 && !isMovefree(blocks, curBlock.x, curBlock.y+64))
+				{
+					
+					Y += 1;
+					mCollider.y = Y; 
+				
+				}
+				else
+				{
+					X = xPrev;
+					mCollider.x = X; 	
+					direction = NONE;
+				}
+			}
+
+
+			if(checkCollision(mCollider, guitarRect))
+			{
+				if(X > guitarRect.x)
+				{
+					X = xPrev;
+					mCollider.x = X; 
+					direction = NONE;
+
+				}
+
+			}
+			for(int i = 0; i < enemies.size(); ++i)
+			{
+				if(checkCollision(mCollider, enemies[i]->getCollider()))
+				{
+					state = "dead";
+				}
 
 			}
 
 		}
-	}
-
-	if(keys[SDL_SCANCODE_LEFT]){
-		xPrev = X;
-		X -= pSpeed;
-		mCollider.x = X;
-		frame = 10;
-		unPauseAnimationTimer();
-
-		direction = LEFT;
-
-		if(checkBlockCollision(mCollider, blocks))
-		{
-			if(mCollider.y < curBlock.y -28)
-			{
-				Y -= pSpeed;
-				mCollider.y = Y; 
-			}
-			else if(mCollider.y > curBlock.y +28)
-			{
-				Y += pSpeed;
-				mCollider.y = Y; 
-			}
-
-			X = xPrev;
-			mCollider.x = X; 
-			direction = NONE;
-		}
-
-
-		if(checkCollision(mCollider, guitarRect))
-		{
-			if(X > guitarRect.x)
-			{
-				X = xPrev;
-				mCollider.x = X; 
-				direction = NONE;
-
-			}
-
-		}
-
-	}
 	
-	if(keys[SDL_SCANCODE_RIGHT]){
+		if(keys[SDL_SCANCODE_RIGHT]){
 		
 		
-		xPrev = X;
-		X += pSpeed;
-		mCollider.x = X;
-		frame = 7;
-		unPauseAnimationTimer();
+			xPrev = X;
+			X += pSpeed;
+			mCollider.x = X;
+			frame = 7;
+			unPauseAnimationTimer();
 
-		direction = RIGHT;
+			direction = RIGHT;
 
-	
-		if(checkBlockCollision(mCollider, blocks))
-		{
-			if(mCollider.y < curBlock.y -28)
+			if(checkBlockCollision(mCollider, blocks, curentBlockType))
 			{
-				Y -= pSpeed;
-				mCollider.y = Y; 
-			}
-			else if(mCollider.y > curBlock.y +28)
-			{
-				Y += pSpeed;
-				mCollider.y = Y; 
-			}
-
-			X = xPrev;
-			mCollider.x = X; 	
-			direction = NONE;
-		}
-	
-		if(checkCollision(mCollider, guitarRect))
-		{
-			if(X < guitarRect.x)
-			{
-				X = xPrev;
-				mCollider.x = X; 
-				direction = NONE;
-
+				
+				if((mCollider.y < curBlock.y -40) && curentBlockType == 3 && !isMovefree(blocks, curBlock.x, curBlock.y-64))
+				{
+					Y -= 1;
+					mCollider.y = Y; 
+					
+					
+				}
+				else if((mCollider.y > curBlock.y +40) && curentBlockType == 3 && !isMovefree(blocks, curBlock.x, curBlock.y+64))
+				{
+					
+					Y += 1;
+					mCollider.y = Y; 
+				
+				}
+				else
+				{
+					X = xPrev;
+					mCollider.x = X; 	
+					direction = NONE;
+				}
+				
 			}
 
-		}
-
-	}
+			
+			
+				
+			}
 	
+			if(checkCollision(mCollider, guitarRect))
+			{
+				if(X < guitarRect.x)
+				{
+					X = xPrev;
+					mCollider.x = X; 
+					direction = NONE;
 
-	
+				}
+
+			}
+			for(int i = 0; i < enemies.size(); ++i)
+			{
+				if(checkCollision(mCollider, enemies[i]->getCollider()))
+				{
+					state = "dead";
+				}
+
+			}
+
+		
+
 	//std:: cout << "inputTimer " << resumeInput << std::endl;
 	//std::cout << "Player " << " guitarFlag " << guitarFlag<<std::endl;
 	//std::cout << "inputCounter " << inputCounter << std::endl;
 	//std::cout << "resumeInput " << resumeInput << std::endl;
 }
-*/
 
-void Player::movePlayer()
-{
-	
-	std::cout << "direction " << direction << std::endl;
-
-	//Move the player left or right
-	X += pVelX;
-	mCollider.x = X;
-
-
-	//Move the player up or down
-	Y += pVelY;
-	mCollider.y = Y;
-}
-
-
-void Player::setPlayerXVel(int x)
-{
-	pVelX = x;
-
-}
-
-void Player::setPlayerYVel(int y)
-{
-	pVelY = y;
-
-}
-
-int Player::getPlayerXVel()
-{
-	return pVelX;
-}
-
-int Player::getPlayerYVel()
-{
-	return pVelY;
-}
 
 int Player::getPlayerSpeed()
 {
@@ -386,6 +426,26 @@ void Player::setAnimationClips()
 }
 
 
+void Player::unPauseAnimationTimer()
+{
+	timer.unpause();
+}
+		
+void Player::pauseAnimationTimer()
+{
+	timer.pause();
+}
+
+std::string Player::getState()
+{
+	return state;
+}
+
+void Player::setState(std::string s)
+{
+	state = s;
+}
+
 bool Player::checkCollision(SDL_Rect a, SDL_Rect b)
 {
 	if(SDL_HasIntersection(&a, &b))
@@ -397,20 +457,41 @@ bool Player::checkCollision(SDL_Rect a, SDL_Rect b)
 	return false; 
 }
 
-bool Player::checkBlockCollision(SDL_Rect src, std::vector<Block*> blocks)
+bool Player::checkBlockCollision(SDL_Rect src, std::vector<Block*> blocks, int & curentBlockType)
 {
-	for(int i = 0; i < blocks.size(); ++i )
+	for(int i = 0; i < blocks.size(); ++i)
 	{
-		if(checkCollision(src, blocks[i]->getCollider()))
+		if(checkCollision(mCollider, blocks[i]->getCollider()))
 		{
+			curentBlockType = blocks[i]->getBlockType();
+
 			return true;
 		}
+
 	}
 
-	return false; 
+	return false;
 }
 
-/*
+bool Player::isMovefree(std::vector<Block*> blocks, int x, int y)
+{
+	for(int i = 0; i < blocks.size(); ++i)
+	{
+	   if(blocks[i]->getX() == x && blocks[i]->getY() == y)
+	   {
+		   if(blocks[i]->getBlockType() == 2)
+		   {
+			   //std::cout<<"blockX " << blocks[i]->getX() << " blockY " << blocks[i]->getY() << " type " << blocks[i]->getBlockType() << std::endl;
+
+			   return true;
+		   }
+	   }
+	}
+
+	return false;
+
+}
+
 void Player::renderPlayer(SDL_Renderer* nRenderer, SDL_Rect& camera)
 {
 	//Render current frame
@@ -428,51 +509,14 @@ void Player::renderPlayer(SDL_Renderer* nRenderer, SDL_Rect& camera)
 	SDL_Rect* currentClip = &bSpriteClips[animationTimer];
 
 	//renders the spritesheet pointing to player 
-	this->render( nRenderer, X- camera.x, Y- camera.y, currentClip );
+	this->render( nRenderer, X-camera.x, Y-camera.y, currentClip );
+
 }
-*/
 
-void Player::loadPlayerTexture(SDL_Renderer* nRenderer)
-{
-	if(!this->loadFromFile(nRenderer, "graphics/boomer_strip2.png")) {
-		printf( "Failed to load entity!\n" );
-	}
-}
-	
-void Player::renderPlayer(SDL_Renderer* nRenderer)
-{
-	//Render current frame
-	Uint32 animationTimer = timer.getTicks()/150; 
-	animationTimer = animationTimer%2;
-	animationTimer += frame;
-
-	std::cout << animationTimer << std::endl;
-
-	if(timer.isPaused())
-	{
-		//sets to the original frame 
-		animationTimer = frame-1;
-	}
-
-	//std::cout << animationTimer << std::endl;
-	SDL_Rect* currentClip = &bSpriteClips[animationTimer];
-
-	//renders the spritesheet pointing to player 
-	this->render( nRenderer, X, Y, currentClip );
-}
 
 void Player::drawPlayerCollision(SDL_Renderer* nRenderer)
 {
-	SDL_SetRenderDrawColor(nRenderer, 0,0,0,255);
+	SDL_SetRenderDrawColor(nRenderer, 255,0,0,255);
 	SDL_RenderDrawRect(nRenderer, &mCollider);  
 }
 
-void Player::unPauseAnimationTimer()
-{
-		timer.unpause();
-}
-
-void Player::pauseAnimationTimer()
-{
-	timer.pause();
-}

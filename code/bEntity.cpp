@@ -47,3 +47,5 @@ SDL_Rect Entity::getCollider()
 {
 	return mCollider; 
 }
+
+

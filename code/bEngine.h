@@ -3,11 +3,14 @@
 
 #include <stdio.h>
 #include <iostream>
+#include "bEntity.h"
 #include "bTexture.h"
 #include "bTimer.h"
 #include "bWindow.h"
+#include "bBlock.h"
 #include "bPlayManager.h"
 #include "bInputManager.h"
+#include "bCollisionManager.h"
 #include "bPlayer.h"
 
 class Engine 
@@ -31,6 +34,8 @@ class Engine
 
 		bool getRunState();
 
+		bool getResetState();
+
 		void updateFpsTimer();
 
 	private:
@@ -47,10 +52,20 @@ class Engine
 		static const int SCREEN_TICK_PER_FRAME = 1000 / SCREEN_FPS;
 
 		SDL_Renderer* nRenderer; 
+
 		PlayManager playManager; 
+
 		InputManager inputManager; 
+
 		Player newPlayer;
+
 		Window window; 
+
+		bool initalizeLevel;
+
+		bool resetState;
+
+		bool gameOverState;
 
 		//Main loop flag
 		bool runState;

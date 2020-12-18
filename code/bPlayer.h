@@ -1,8 +1,11 @@
-#pragma once
+#pragma once 
 #include "bEntity.h"
 #include "bTimer.h"
 #include "bGuitar.h"
+#include "bEnemy.h"
 #include "bBlock.h"
+#include <iostream>
+
 #include <vector>
 
 class Player : public Entity
@@ -24,45 +27,37 @@ class Player : public Entity
  
         ~Player();
 
-		//void playerInput(const Uint8* keys, std::vector<Block*> blocks, SDL_Rect guitarRect, bool &guitarFlag, Guitar &guitar, bool &explosionFlag);
+		void playerInput(const Uint8* keys, std::vector<Block*> blocks, std::vector<Enemy*> enemies,
+			SDL_Rect guitarRect, bool &guitarFlag, Guitar &guitar, bool &explosionFlag, SDL_Rect&);
 
-	    void setAnimationClips();
+		bool checkCollision(SDL_Rect a, SDL_Rect b);
 
-		void loadPlayerTexture(SDL_Renderer* nRenderer);
+		bool checkBlockCollision(SDL_Rect src, std::vector<Block*> blocks, int &curentBlockType);
 
-		//void renderPlayer(SDL_Renderer* nRenderer, SDL_Rect& camera); 
-		void renderPlayer(SDL_Renderer* nRenderer);
+		bool isMovefree(std::vector<Block*> blocks, int x, int y);
 
 		void unPauseAnimationTimer();
 		
 		void pauseAnimationTimer();
 
-		bool checkCollision(SDL_Rect src, SDL_Rect dest); 
+	    void setAnimationClips();
 
-		bool checkBlockCollision(SDL_Rect src, std::vector<Block*> blocks);
+		void renderPlayer(SDL_Renderer* nRenderer, SDL_Rect&);
 
 		void drawPlayerCollision(SDL_Renderer* nRenderer);
 
-		void movePlayer();
-
 		int getPlayerSpeed();
 
-		void setPlayerXVel(int x);
-
-		void setPlayerYVel(int y);
-
-		int getPlayerXVel();
-
-		int getPlayerYVel();
+		std::string getState();
+		void setState(std::string s);
 
 	private:
-		int pVelX;
-		int pVelY;
-
 		int yPrev;
 		int xPrev;
 
 		int pSpeed;
+
+		Texture *mTexture;
 
 		SDL_Rect bSpriteClips[ WALKING_ANIMATION_FRAMES ];
 		int frame;
@@ -73,10 +68,14 @@ class Player : public Entity
 		Uint32 resumeInput;
 		bool timerStart;
 
-		SDL_Rect curBlock;
+		bool collided;
+		
+		SDL_Rect nCollider; 
+
+		std::string state;
+
 		//bool collision;
 		Facing direction;
 
-		friend class InputManager;
 	
 };

@@ -93,7 +93,8 @@ void Explosion::renderExplosion(SDL_Renderer* nRenderer, bool &explosionFlag, SD
 		{
 			explosionFlag = false;
 			animationTimer = 0;
-
+			mCollider.x = 0;
+			mCollider.y = 0;
 		}
 
 	}

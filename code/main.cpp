@@ -7,6 +7,7 @@ int main(int argc, char *args[])
 {
 	Engine engine;
 	bool run = engine.getRunState();
+	bool reset = engine.getResetState();
 
 	if(!engine.initSDL()){
 		printf( "SDL could not initialize! SDL Error: %s\n", SDL_GetError() );
@@ -17,7 +18,7 @@ int main(int argc, char *args[])
 		
 		while(engine.running(run)){
 				engine.update();
-			}
+		}
 	}
 
 	return 0;

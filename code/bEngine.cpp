@@ -4,14 +4,17 @@ Engine::Engine()
 {
   countedFrames = 0;
   runState = true;
+  resetState = false;
   newPlayer = Player(); 
   guitarFlag = false; 
+  initalizeLevel = true;
 }
 
 Engine::~Engine() { }
 
 bool Engine::running(bool & quit)
 {
+
 	if(!quit)
 	{
 	   closeSDL();
@@ -23,6 +26,11 @@ bool Engine::running(bool & quit)
 bool Engine::getRunState()
 {
 	return runState; 
+}
+
+bool Engine::getResetState()
+{
+	return resetState; 
 }
 
 bool Engine::initSDL()
@@ -88,6 +96,7 @@ void Engine::initWindow()
 
 			//Initialize PNG loading
 			int imgFlags = IMG_INIT_PNG;
+
 			if( !( IMG_Init( imgFlags ) & imgFlags ) )
 			{
 				printf( "SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError() );
@@ -99,10 +108,9 @@ void Engine::initWindow()
 			}
 		}
 
-		newPlayer.loadPlayerTexture(nRenderer);
-
-		playManager.loadMedia(window, nRenderer);
 		
+
+
 	}
 }
 
@@ -110,8 +118,25 @@ void Engine::initWindow()
 void Engine::update()
 {
 	capTimer.start();
+	/*
+	For levels:
+	create an enum - ie LEVEL1
+	Pass through the playManager to determine what enemies are drawn and title screen displayed or not
 
-	if(inputManager.mainInputs(runState, newPlayer, window.getWindow(), guitarFlag))
+	*/
+	if(initalizeLevel){
+		playManager.loadMedia(window, nRenderer);
+		initalizeLevel = false;	
+	}
+	else if(resetState)
+	{
+		//used so we can clear objects
+		playManager.free(); 
+		playManager.loadMedia(window, nRenderer);
+		resetState = false;
+	}
+
+	if(inputManager.mainInputs(runState, window.getWindow(), guitarFlag))
 	{
 		//Only draw when not minimized
 		if( !window.isMinimized() )
@@ -131,14 +156,21 @@ void Engine::update()
 			SDL_RenderClear(nRenderer);
 
 			++countedFrames;
-	
-			playManager.updateLevel(nRenderer, window, guitarFlag);
 
-			newPlayer.movePlayer();
+			////Collision Events
+			//for(int i = 0;i < Entity::entityColList.size();++i) {
+			//	Entity* entityA = Entity::entityColList.at(i);
 
-			newPlayer.renderPlayer(nRenderer); 
+			//	if(entityA == NULL || entityA == NULL) continue;
 
-			SDL_RenderPresent( nRenderer );
+		
+			//	newPlayer.checkCollision(entityA->getCollider());
+			//	
+			//	
+			//}
+			if(!resetState){
+				playManager.updateLevel(nRenderer, window, guitarFlag, resetState);
+			}
 		}
 
 	}
@@ -147,6 +179,8 @@ void Engine::update()
 		runState = false;
 		running(runState);
 	}
+
+
 
 	updateFpsTimer();
 	

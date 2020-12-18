@@ -27,6 +27,8 @@ class Explosion :
 		void drawExplosionCollision(SDL_Renderer* nRenderer);
 
 		void resetCollision();
+		
+		void zeroCollision();
 
 	private:
 		static const int EXPLOSION_ANIMATION_FRAMES = 9;

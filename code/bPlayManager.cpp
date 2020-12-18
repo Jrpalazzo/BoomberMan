@@ -12,45 +12,28 @@ const int GRID_SIZE = 64;
 const int TOTAL_PARTICLES = 9;
 const int MAP_TILES = 231;
 
-const int TOTAL_SOLIDS = 88;
+int SCREEN_WIDTH = 21;
+int SCREEN_HEIGHT = 11;
 
-const int LEVEL_WIDTH = 1300;
+const int LEVEL_WIDTH = 1344;
 const int LEVEL_HEIGHT = 768;
 
 const Uint8* keys = SDL_GetKeyboardState(NULL);
 
-//Map tile amount 
-int Map[MAP_TILES] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-					1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-					1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,
-					1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-					1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,
-					1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-					1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,
-					1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-					1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,
-					1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-					1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
-
 bool guitarFlag = false;
-bool explosionFlag = false; 
+bool explosionFlag = false;
 
 bool playMusic = false;
 
 int curPlayerX = 0;
 int curPlayerY = 0;
-
+int enemyCount = 6;
 
 //The particles
 Particle* particles[TOTAL_PARTICLES];
 
 PlayManager::PlayManager(){
-	gMusic = NULL;
-    initalized = false;
-	hasCollided = false;
-	srand(time(NULL)); 
-	blocks.reserve(209);
-	deathTimer = 200;
+	
 }
 
 PlayManager::~PlayManager() { }
@@ -60,31 +43,31 @@ void PlayManager::loadMedia(Window nWindow, SDL_Renderer* nRenderer)
 	//load hud timer
 	if( !hudTimerTexture.loadFromFile(nRenderer,"graphics/numbers_strip.png" ) )
 	{
-		printf( "Failed to load note3 texture!\n" );
+		printf( "Failed to load numbers texture!\n" );
 	}
 
 	//Load scene texture
 	if( !tileTexture.loadFromFile(nRenderer, "graphics/tile1.png" ) )
 	{
-		printf( "Failed to load window texture!\n" );
+		printf( "Failed to load tile1 texture!\n" );
 	}
 
 	if( !tileTexture2.loadFromFile(nRenderer,"graphics/tile2.png" ) )
 	{
-		printf( "Failed to load note3 texture!\n" );
+		printf( "Failed to load tile2 texture!\n" );
 	}
 
 	if( !tileTexture3.loadFromFile(nRenderer,"graphics/tile3.png" ) )
 	{
-		printf( "Failed to load note3 texture!\n" );
+		printf( "Failed to load tile3 texture!\n" );
 	}
 
-	/*
+	
 	//Load player surface
 	if(!newPlayer.loadFromFile(nRenderer, "graphics/boomer_strip2.png")) {
-		printf( "Failed to load entity!\n" );
+		printf( "Failed to load player texture!\n" );
 	}
-	*/
+	
 
 	if( !note1.loadFromFile(nRenderer,"graphics/note_1.png" ) )
 	{
@@ -103,17 +86,17 @@ void PlayManager::loadMedia(Window nWindow, SDL_Renderer* nRenderer)
 
 	if( !guitar.loadFromFile(nRenderer,"graphics/guitar_strip2.png" ) )
 	{
-		printf( "Failed to load note3 texture!\n" );
+		printf( "Failed to load guitar texture!\n" );
 	}
 
 	if( !explosionTexture.loadFromFile(nRenderer,"graphics/explosion_strip2.png" ) )
 	{
-		printf( "Failed to load note3 texture!\n" );
+		printf( "Failed to load explosion texture!\n" );
 	}
 
-	if( !enemy1Texture.loadFromFile(nRenderer,"graphics/enemy_1.png" ) )
+	if( !enemy1Texture.loadFromFile(nRenderer,"graphics/enemy_strip.png" ) )
 	{
-		printf( "Failed to load note3 texture!\n" );
+		printf( "Failed to load enemy texture!\n" );
 	}
 
 	gMusic = Mix_LoadMUS("music/bomb_theme.wav");
@@ -129,13 +112,26 @@ void PlayManager::loadMedia(Window nWindow, SDL_Renderer* nRenderer)
     }
 
 	for(int i = 0; i < 5; ++i){
-			explosions.push_back(new Explosion(explosionTexture, guitar.getX(), guitar.getY()));		
+			explosions.push_back(new Explosion(explosionTexture, guitar.getX(), guitar.getY()));
+			explosions[i]->setX(0);
+			explosions[i]->setY(0);
 	}
+
+	gMusic = NULL;
+    initalized = false;
+	hasCollided = false;
+	srand(time(NULL)); 
+
+	blocks.reserve(209);
+
+	deathTimer = 200;
 
 	hudTimer = GameText(hudTimerTexture, 128, 16);
 
-	enemies.push_back(new Enemy(enemy1Texture, 128, 128));		
-	
+	//change where this is called later
+	srand ( (unsigned)time(NULL));
+    rand(); rand(); rand();
+
 	generateMap(nRenderer);
 
 	hudTimer.updateGameTimer(200);
@@ -144,6 +140,12 @@ void PlayManager::loadMedia(Window nWindow, SDL_Renderer* nRenderer)
 	camera.y = 0;
 	camera.w = nWindow.getWidth();
 	camera.h = nWindow.getHeight();
+
+	newPlayer.setX(64);
+	newPlayer.setY(128);
+	
+	newPlayer.setColliderX(64);
+	newPlayer.setColliderY(128);
 
 	//std::cout << nWindow.getWidth() << std::endl; 
 }
@@ -164,6 +166,20 @@ void PlayManager::drawHud(SDL_Renderer * renderer)
 
 void PlayManager::generateMap(SDL_Renderer* nRenderer)
 {
+	//Map tile amount 
+
+	int Map[MAP_TILES] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+						  1,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+						  1,5,3,0,3,0,3,0,3,0,3,0,3,0,3,0,3,0,3,0,1,
+						  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+						  1,0,3,0,3,0,3,0,3,0,3,0,3,0,3,0,3,0,3,0,1,
+						  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+						  1,0,3,0,3,0,3,0,3,0,3,0,3,0,3,0,3,0,3,0,1,
+						  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+						  1,0,3,0,3,0,3,0,3,0,3,0,3,0,3,0,3,0,3,0,1,
+						  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+						  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+
 	//Randomly add blocks to the map
 	int randValue = 0;
 	int randBlock = 35;
@@ -176,11 +192,11 @@ void PlayManager::generateMap(SDL_Renderer* nRenderer)
 				break;
 			}
 
-			if((i == 20 || i == 21 || i == 39)){
+			if(Map[i] == 5 ){
 				continue;
 			}
 
-			if(Map[i] == 1){
+			if(Map[i] == 1 || Map[i] == 3){
 				continue;
 			}
 			else
@@ -201,8 +217,6 @@ void PlayManager::generateMap(SDL_Renderer* nRenderer)
 	int x = 0;
 	int y = 1;
 
-	int SCREEN_WIDTH = 21;
-					
 	//int tile = -1;
 	int blockCounter = 0;
 	int breakBlockCounter = 0;
@@ -216,6 +230,11 @@ void PlayManager::generateMap(SDL_Renderer* nRenderer)
 			blocks.push_back(new Block(tileTexture3, x*GRID_SIZE, y*GRID_SIZE, 1));
 		}
 
+		if(Map[i] ==3){
+			blocks.push_back(new Block(tileTexture3, x*GRID_SIZE, y*GRID_SIZE, 3));
+			innerBlocks.push_back(new Block(tileTexture3, x*GRID_SIZE, y*GRID_SIZE, 1));
+		}
+		
 		x++;
 
 		if(x >= SCREEN_WIDTH )
@@ -224,52 +243,156 @@ void PlayManager::generateMap(SDL_Renderer* nRenderer)
 			y += 1;
 		}					
 	}
-}
 
-void PlayManager::updateLevel(SDL_Renderer* nRenderer, Window nWindow, bool &guitarFlag)
-{
+	//run the loop again to place the enemies in a free spot
+	std::vector< std::pair <int,int> > freeSpots; 
+	x = 0;
+	y = 1;
 
-	//Clear screen
-	//SDL_SetRenderDrawColor( nRenderer, 0, 120, 0, 0);
-	//SDL_RenderClear(nRenderer);
-	
+	for(int i = 0; i <= MAP_TILES; ++i){
+		if(Map[i] ==0){
+			freeSpots.push_back(std::make_pair(x*GRID_SIZE,y*GRID_SIZE));
+		}
+		x++;
 
-	drawHud(nRenderer);
-	hudTimer.render(nRenderer);
-
-	//Show solid blocks
-	for( signed int i = 0; i < blocks.size(); ++i)
-	{
-		blocks[i]->render(nRenderer, camera); 
-		//blocks[i]->drawBlockCollision(nRenderer);
+		if(x >= SCREEN_WIDTH )
+		{
+			x = 0;
+			y += 1;
+		}
 	}
 
-	//pause timer to stop animation 
-	//newPlayer.pauseAnimationTimer();
+	// Printing the vector 
+    for (int i=0; i<enemyCount; i++) 
+    { 
+		std::random_shuffle( freeSpots.begin(), freeSpots.end() );
 
-	//newPlayer.playerInput(keys,blocks, guitar.getCollider(), guitarFlag, guitar, explosionFlag);
+		if(freeSpots[0].first == 64 && freeSpots[0].second == 128)
+		{
+			std::random_shuffle( freeSpots.begin(), freeSpots.end() );
+		}
+		else
+		{
+			int randomValue = rand()%3;
+			enemies.push_back(new Enemy(enemy1Texture, freeSpots[0].first, freeSpots[0].second, randomValue));	
+	
+		}
+		//std::cout << freeSpots[i].first << " " << freeSpots[i].second << std::endl;
+		
+	}
+
+	//if(randX + randY  <= 10){
+	//			int randomValue = rand()%3;
+	//			enemies.push_back(new Enemy(enemy1Texture, x*GRID_SIZE, y*GRID_SIZE, randomValue));	
+	//			enemyCount--;
+	//}
+
+	//add six enemies
+	/*enemies.push_back(new Enemy(enemy1Texture, randPos*GRID_SIZE, randPos*GRID_SIZE, randomValue));		
+	enemies.push_back(new Enemy(enemy1Texture, randPos*GRID_SIZE, randPos*GRID_SIZE, randomValue));	
+	enemies.push_back(new Enemy(enemy1Texture, randPos*GRID_SIZE, randPos*GRID_SIZE, randomValue));	
+	enemies.push_back(new Enemy(enemy1Texture, randPos*GRID_SIZE, randPos*GRID_SIZE, randomValue));		
+	enemies.push_back(new Enemy(enemy1Texture, randPos*GRID_SIZE, randPos*GRID_SIZE, randomValue));	
+	enemies.push_back(new Enemy(enemy1Texture, randPos*GRID_SIZE, randPos*GRID_SIZE, randomValue));*/
+	//y pos 192 320 448 576
+	//x pos 128 256 384 512 640 768 896 1024 1152
+	/*for(int b = 0; b < innerBlocks.size(); ++b)
+	{
+		std::cout<<innerBlocks[b]->getX()<< " , " << innerBlocks[b]->getY()<<std::endl;
+	}*/
+
+	
+	
+	std::cout<< Map[0] << std::endl;
+	
+	
+}
+
+void PlayManager::updateLevel(SDL_Renderer* nRenderer, Window nWindow, bool &guitarFlag, bool &resetState)
+{
+	//Clear screen
+	SDL_SetRenderDrawColor( nRenderer, 0, 120, 0, 0);
+	SDL_RenderClear(nRenderer);
+	
+
+	if(checkPlayerDeath(newPlayer))
+	{
+		resetState = true;
+		newPlayer.setState("alive");
+	}
+	else
+	{
+		drawHud(nRenderer);
+		hudTimer.render(nRenderer);
+
+		//Show solid blocks
+		for( signed int i = 0; i < blocks.size(); ++i)
+		{
+			blocks[i]->render(nRenderer, camera); 
+			//blocks[i]->drawBlockCollision(nRenderer);
+		}
+
+		//pause timer to stop animation 
+		newPlayer.pauseAnimationTimer();
+
+		newPlayer.playerInput(keys,blocks, enemies, guitar.getCollider(), guitarFlag, guitar, explosionFlag, camera);
 
 
-	//if the player presses z create an instance of the guitar 
-	createGuitar(nRenderer, guitarFlag);
+		//if the player presses z create an instance of the guitar 
+		createGuitar(nRenderer, guitarFlag);
 
-	//display the enemies 
-	enemies[0]->renderEnemy(nRenderer);
+		//display the enemies 
 
-	//render after since the guitar should be below the player
-	//newPlayer.renderPlayer(nRenderer, camera); 
+		//move enemy and check collision 
+		for( signed int i = 0; i < enemies.size(); ++i)
+		{
+			enemies[i]->move(blocks);
 
-	//newPlayer.drawPlayerCollision(nRenderer); 
+			enemies[i]->renderEnemy(nRenderer, camera);
+			//enemies[i]->drawEnemyCollision(nRenderer); 
+		}
 
-	//move enemy and check collision 
-	enemies[0]->move();
-	//enemies[0]->checkCollision();
+		/*
+		for(int i = 0; i < explosions.size(); ++i)
+		{	
+			explosions[i]->drawExplosionCollision(nRenderer);	
+					
+		}
+		*/
 
-	//Update screen
-	//render camera
-	setCamera(nWindow, camera, newPlayer.getX(), newPlayer.getY());
 
-	//SDL_RenderPresent( nRenderer );
+		//enemies[0]->move(blocks);
+		//enemies[0]->renderEnemy(nRenderer, camera);
+		//enemies[0]->drawEnemyCollision(nRenderer); 
+
+		//render after since the guitar should be below the player
+		newPlayer.renderPlayer(nRenderer, camera); 
+
+		//newPlayer.drawPlayerCollision(nRenderer);
+
+
+		//Update screen
+		//render camera
+		setCamera(nWindow, camera, newPlayer.getX(), newPlayer.getY());
+
+		/*SDL_SetRenderDrawColor(nRenderer, 255,0,0,255);
+		SDL_RenderDrawRect(nRenderer, &camera); */ 
+
+		SDL_RenderPresent( nRenderer );
+	}
+}
+
+bool PlayManager::checkPlayerDeath(Player &player)
+{
+	if(player.getState() == "dead")
+	{
+		//std::cout<<player.getState()<<std::endl;
+		
+		return true;
+	}
+	else
+		return false;
+
 }
 
 void PlayManager::createGuitar(SDL_Renderer* nRenderer, bool &guitarFlag)
@@ -286,24 +409,24 @@ void PlayManager::createGuitar(SDL_Renderer* nRenderer, bool &guitarFlag)
 			int curGuitarX = guitar.getX();
 			int curGuitarY = guitar.getY();
 
-			explosions[0]->setX(curGuitarX - (curGuitarX % GRID_SIZE));
-			explosions[0]->setY(curGuitarY - (curGuitarY % GRID_SIZE));
+			explosions[0]->setX(curGuitarX);
+			explosions[0]->setY(curGuitarY);
 			explosions[0]->resetCollision();
 
-			explosions[1]->setX(curGuitarX - (curGuitarX % GRID_SIZE));
-			explosions[1]->setY(curGuitarY - (curGuitarY % GRID_SIZE)+GRID_SIZE);
+			explosions[1]->setX(curGuitarX);
+			explosions[1]->setY(curGuitarY+GRID_SIZE);
 			explosions[1]->resetCollision();
 
-			explosions[2]->setX(curGuitarX - (curGuitarX % GRID_SIZE)+GRID_SIZE);
-			explosions[2]->setY(curGuitarY - (curGuitarY % GRID_SIZE));
+			explosions[2]->setX(curGuitarX+GRID_SIZE);
+			explosions[2]->setY(curGuitarY);
 			explosions[2]->resetCollision();
 
-			explosions[3]->setX(curGuitarX - (curGuitarX % 64)-GRID_SIZE);
-			explosions[3]->setY(curGuitarY - (curGuitarY % 64));
+			explosions[3]->setX(curGuitarX-GRID_SIZE);
+			explosions[3]->setY(curGuitarY);
 			explosions[3]->resetCollision();
 
-			explosions[4]->setX(curGuitarX - (curGuitarX % 64));
-			explosions[4]->setY(curGuitarY - (curGuitarY % 64)-GRID_SIZE);
+			explosions[4]->setX(curGuitarX);
+			explosions[4]->setY(curGuitarY-GRID_SIZE);
 			explosions[4]->resetCollision();
 
 			for(int i = 0; i < blocks.size(); ++i)
@@ -312,12 +435,22 @@ void PlayManager::createGuitar(SDL_Renderer* nRenderer, bool &guitarFlag)
 				{
 					if(SDL_HasIntersection(&explosions[j]->getCollider(), &newPlayer.getCollider()))
 					{
-			
-						newPlayer.setX(64);
-						newPlayer.setY(128);
-
+						std::cout<<"yo"<<std::endl;
+						newPlayer.setState("dead");
 					}
+					else
+					{
+						for (int z=0; z<enemyCount; z++) 
+						{ 
+							if(SDL_HasIntersection(&explosions[j]->getCollider(), &enemies[z]->getCollider()))
+							{
 
+								 enemies.erase(enemies.begin()+z);
+
+							}
+						}
+					}
+					
 					if(SDL_HasIntersection(&explosions[j]->getCollider(), &blocks[i]->getCollider()))
 					{
 						hasCollided = true; 
@@ -326,21 +459,24 @@ void PlayManager::createGuitar(SDL_Renderer* nRenderer, bool &guitarFlag)
 						if(blocks[i]->getBlockType() == 2)
 							blocks.erase(blocks.begin()+i);
 					}
-				
+					
 				}
-
+				
 				
 			}
 
 			    for(int i = 0; i < explosions.size(); ++i)
 				{	
 					explosions[i]->renderExplosion(nRenderer, explosionFlag, camera);	
-					
+					explosions[i]->setX(0);
+					explosions[i]->setY(0);
 			    }
+
+				//set the guitar to the origin for the next keypress
 				
 		}
-
 		Mix_HaltMusic();
+
 	}
 	else 
 	{
@@ -372,6 +508,7 @@ void PlayManager::createGuitar(SDL_Renderer* nRenderer, bool &guitarFlag)
 
 
 }
+
 
 void PlayManager::setCamera(Window window, SDL_Rect& camera, int x, int y)
 {
@@ -414,18 +551,23 @@ void PlayManager::free()
 	for( signed int i = 0; i < blocks.size(); ++i)
 	{
 		blocks.clear();
-		//blocks[i]->drawBlockCollision(nRenderer);
 	}
 
 	for(int i = 0; i < explosions.size(); ++i){
 			explosions.clear();	
 	}
 
+	for( signed int i = 0; i < enemies.size(); ++i)
+	{
+		enemies.clear();
+	}
+
+	newPlayer.free();
+
 	tileTexture.free(); 
 	tileTexture2.free();
 	tileTexture3.free();
 
-	boomerTexture.free();
 	note1.free();
 	note2.free();
 	note3.free();

@@ -2,8 +2,11 @@
 
 Guitar::Guitar()
 {
+
 	animationCounter = 0;
 	setAnimationClips(); 
+	mCollider.w = Width-4;
+	mCollider.h = Height-4;
 	X = 64;
 	Y = 64; 
 	mCollider.x = X;

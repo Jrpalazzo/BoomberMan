@@ -2,6 +2,8 @@
 #define BPLAYMANAGER_h
 
 #include <SDL.h>
+#include <utility>
+#include <algorithm>    // std::random_shuffle
 #include "bWindow.h"
 #include "bTexture.h"
 #include "bPlayer.h"
@@ -24,9 +26,11 @@ class PlayManager
 
 		~PlayManager();
 
+		static std::vector<Entity*> entityColList;
+
 		void loadMedia(Window nWindow, SDL_Renderer* nRenderer);
 
-		void updateLevel(SDL_Renderer* nRenderer, Window nWindow, bool &guitarFlag);
+		void updateLevel(SDL_Renderer* nRenderer, Window nWindow, bool &guitarFlag, bool &resetState);
 
 		void generateMap(SDL_Renderer* nRenderer);
 
@@ -37,6 +41,9 @@ class PlayManager
 		void drawHud(SDL_Renderer* nRenderer);
 
 		void createGuitar(SDL_Renderer* nRenderer, bool &guitarFlag); 
+
+		bool checkPlayerDeath(Player &player);
+
 		//bool checkBombCollsion(SDL_Renderer* nRenderer, std::vector<Explosion*> &explosions, Block *& block, SDL_Rect playerRect, bool &hasCollided); 
 
 		//void alignToGrid();
@@ -56,6 +63,8 @@ class PlayManager
 		InputManager input; 
 
 		std::vector<Block*> blocks;
+		std::vector<Block*> innerBlocks;
+
 		std::vector<Explosion*> explosions;
 		std::vector<Enemy*> enemies;
 
@@ -66,7 +75,6 @@ class PlayManager
 
 		//original 
 		Texture tileTexture3;
-		Texture boomerTexture;
 		Texture explosionTexture; 
 		Texture guitarTexture;
 		Texture enemy1Texture; 

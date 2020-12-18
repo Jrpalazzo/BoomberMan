@@ -31,9 +31,12 @@ class Entity : public Texture
 
 		SDL_Rect getCollider();
 
-        //void OnCleanup();
+		Entity* entityA;
+		Entity* entityB;
 
 	protected:
+		SDL_Rect curBlock;
+		int lastBlockPos;
 
 		int X;
         int Y;
