@@ -1,0 +1,269 @@
+void Player::playerInput(const Uint8* keys, std::vector<Block*> blocks, std::vector<Block*> innerBlocks,
+	SDL_Rect guitarRect, bool &guitarFlag, Guitar &guitar, bool &explosionFlag)
+{
+	int xPrev,yPrev;
+
+	SDL_PumpEvents();
+
+	resumeInput = inputTimer.getTicks()/250; 
+	resumeInput = resumeInput%12;
+
+	if((!inputTimer.isStarted()) && guitarFlag == true){
+		
+		resumeInput = 0;
+
+		inputTimer.start();
+			
+		std::cout << "direction " << direction << std::endl;
+		std::cout << "playerX " << X << " playerY " << X << " setX " << X - ( X % 64) << " setY " << Y - ( Y % 64) << std::endl; 
+
+		guitar.setX(X - (X % 64));
+		guitar.setY(Y - (Y % 64));
+
+		/*if(direction == UP)
+		{
+			guitar.setX(X - (X % 64));
+			guitar.setY(Y - (Y % 64)+64);
+
+			if(direction == NONE)
+			{
+				guitar.setY(Y - (Y % 64));
+
+			}
+		}
+		else if(direction == LEFT)
+		{
+			guitar.setY(Y - (Y % 64));
+			guitar.setX(X - (X % 64)+64);
+
+			if(direction == NONE)
+			{
+				guitar.setX(X - (X % 64));
+
+			}
+		}
+		else 
+		{
+			guitar.setX(X - (X % 64));
+			guitar.setY(Y - (Y % 64));
+		}*/
+	
+
+	}
+	
+
+	if(resumeInput == 11){
+		inputTimer.stop();
+		
+		explosionFlag = true;
+
+		guitarFlag = false;
+
+		//std::cout << "playerX " << X << " playerY " << Y << " guitarX " << guitar.getX() << " guitarY " << guitar.getY() << std::endl; 
+	}
+
+	if(keys[SDL_SCANCODE_UP]){
+		yPrev = Y;
+		Y -= pSpeed;
+		mCollider.y = Y; 
+
+		frame = 4;
+		unPauseAnimationTimer();
+
+		direction = UP;
+
+		if(checkBlockCollision(mCollider, blocks))
+		{
+
+			if(mCollider.x < curBlock.x -50)
+			{
+				X -= pSpeed;
+				
+				mCollider.y = Y; 
+				mCollider.x = X;
+			}
+			else if(mCollider.x > curBlock.x +50)
+			{
+				X += pSpeed;;
+				
+				mCollider.y = Y; 
+				mCollider.x = X;
+			}
+			else
+			{
+				Y = yPrev;
+				mCollider.y = Y; 
+				direction = NONE;
+			}
+
+
+		}
+
+		if(checkCollision(mCollider, guitarRect))
+		{
+			if(Y > guitarRect.y)
+			{
+				Y = yPrev;
+				mCollider.y = Y; 
+				direction = NONE;
+
+			}
+
+		}
+
+	}
+
+	if(keys[SDL_SCANCODE_DOWN]){
+		yPrev = Y;
+		Y += pSpeed;
+		mCollider.y = Y; 
+		frame = 1;
+		unPauseAnimationTimer();
+
+		direction = DOWN;
+
+		if(checkBlockCollision(mCollider, blocks))
+		{
+			if(mCollider.x < curBlock.x -50)
+			{
+				X -= pSpeed;
+				
+				mCollider.y = Y; 
+				mCollider.x = X;
+			}
+			else if(mCollider.x > curBlock.x +50)
+			{
+				X += pSpeed;;
+				
+				mCollider.y = Y; 
+				mCollider.x = X;
+			}
+			else
+			{
+				Y = yPrev;
+				mCollider.y = Y; 
+				direction = NONE;
+			}
+		}
+
+		
+		if(checkCollision(mCollider, guitarRect))
+		{
+			if(Y < guitarRect.y)
+			{
+				Y = yPrev;
+				mCollider.y = Y; 
+				direction = NONE;
+
+			}
+
+		}
+	}
+
+	if(keys[SDL_SCANCODE_LEFT]){
+		xPrev = X;
+		X -= pSpeed;
+		mCollider.x = X;
+		frame = 10;
+		unPauseAnimationTimer();
+
+		direction = LEFT;
+
+		if(checkBlockCollision(mCollider, blocks))
+		{
+			if(mCollider.y < curBlock.y -50)
+			{
+				Y -= pSpeed;
+				
+				mCollider.y = Y; 
+				mCollider.x = X;
+			}
+			else if(mCollider.y > curBlock.y +50)
+			{
+				Y += pSpeed;
+				
+				mCollider.y = Y; 
+				mCollider.x = X;
+			}
+			else
+			{
+				X = xPrev;
+				mCollider.x = X; 	
+				direction = NONE;
+			}
+		}
+
+
+		if(checkCollision(mCollider, guitarRect))
+		{
+			if(X > guitarRect.x)
+			{
+				X = xPrev;
+				mCollider.x = X; 
+				direction = NONE;
+
+			}
+
+		}
+
+	}
+	
+	if(keys[SDL_SCANCODE_RIGHT]){
+		
+		
+		xPrev = X;
+		X += pSpeed;
+		mCollider.x = X;
+		frame = 7;
+		unPauseAnimationTimer();
+
+		direction = RIGHT;
+
+		if(checkBlockCollision(mCollider, blocks))
+		{
+			if(mCollider.y < curBlock.y -50)
+			{
+				Y -= pSpeed;
+				
+				mCollider.y = Y; 
+				mCollider.x = X;
+			}
+			else if(mCollider.y > curBlock.y +50)
+			{
+				Y += pSpeed;
+				
+				mCollider.y = Y; 
+				mCollider.x = X;
+			}
+			else
+			{
+				X = xPrev;
+				mCollider.x = X; 	
+				direction = NONE;
+			}
+		
+
+			
+		}
+	
+		if(checkCollision(mCollider, guitarRect))
+		{
+			if(X < guitarRect.x)
+			{
+				X = xPrev;
+				mCollider.x = X; 
+				direction = NONE;
+
+			}
+
+		}
+
+	}
+	
+
+	
+	//std:: cout << "inputTimer " << resumeInput << std::endl;
+	//std::cout << "Player " << " guitarFlag " << guitarFlag<<std::endl;
+	//std::cout << "inputCounter " << inputCounter << std::endl;
+	//std::cout << "resumeInput " << resumeInput << std::endl;
+}

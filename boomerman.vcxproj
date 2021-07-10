@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="graphics\boom_sheet.png" />
+    <None Include="graphics\note_1.png" />
+    <None Include="graphics\note_2.png" />
+    <None Include="graphics\note_3.png" />
+    <None Include="graphics\selector.png" />
+    <None Include="graphics\tile1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="bEnemy.cpp" />
+    <ClCompile Include="bEntity.cpp" />
+    <ClCompile Include="bGameText.cpp" />
+    <ClCompile Include="bInputManager.cpp" />
+    <ClCompile Include="bParticle.cpp" />
+    <ClCompile Include="bPlayManager.cpp" />
+    <ClCompile Include="bBlock.cpp" />
+    <ClCompile Include="bTexture.cpp" />
+    <ClCompile Include="bTimer.cpp" />
+    <ClCompile Include="bWindow.cpp" />
+    <ClCompile Include="bEngine.cpp" />
+    <ClCompile Include="bGuitar.cpp" />
+    <ClCompile Include="bExplosion.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="bPlayer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="bEnemy.h" />
+    <ClInclude Include="bEntity.h" />
+    <ClInclude Include="bGameText.h" />
+    <ClInclude Include="bInputManager.h" />
+    <ClInclude Include="bParticle.h" />
+    <ClInclude Include="bPlayManager.h" />
+    <ClInclude Include="bBLock.h" />
+    <ClInclude Include="bTexture.h" />
+    <ClInclude Include="bTimer.h" />
+    <ClInclude Include="bWindow.h" />
+    <ClInclude Include="bEngine.h" />
+    <ClInclude Include="bPlayer.h" />
+    <ClInclude Include="bGuitar.h" />
+    <ClInclude Include="bExplosion.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{9513641F-D7A2-4E16-8C28-9DD1529FAD2E}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>boomerman</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\Joseph\Documents\C++ Projects\2D_Programming\boomer\SDL\SDL2_ttf-2.0.15\include;C:\Users\Joseph\Documents\C++ Projects\2D_Programming\boomer\SDL\SDL2-2.0.12\include;C:\Users\Joseph\Documents\C++ Projects\2D_Programming\boomer\SDL\SDL2_mixer-2.0.4\include;C:\Users\Joseph\Documents\C++ Projects\2D_Programming\boomer\SDL\SDL2_image-2.0.5\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Visual Leak Detector\include;C:\Users\Joseph\Documents\C++ Projects\2D_Programming\boomer\SDL\SDL2_mixer-2.0.4\lib\x86;C:\Users\Joseph\Documents\C++ Projects\2D_Programming\boomer\SDL\SDL2_ttf-2.0.15\lib\x86;C:\Users\Joseph\Documents\C++ Projects\2D_Programming\boomer\SDL\SDL2-2.0.12\lib\x86;C:\Users\Joseph\Documents\C++ Projects\2D_Programming\boomer\SDL\SDL2_image-2.0.5\lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Users\josep\Documents\c++_game\boomer\SDL\SDL2-2.0.12\include;C:\Users\josep\Documents\c++_game\boomer\SDL\SDL2_image-2.0.5\include;C:\Users\josep\Documents\c++_game\boomer\SDL\SDL2_mixer-2.0.4\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\josep\Documents\c++_game\boomer\SDL\SDL2_image-2.0.5\lib\x86;C:\Users\josep\Documents\c++_game\boomer\SDL\SDL2-2.0.12\lib\x86;C:\Users\josep\Documents\c++_game\boomer\SDL\SDL2_mixer-2.0.4\lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

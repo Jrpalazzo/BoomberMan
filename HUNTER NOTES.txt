@@ -1,0 +1,2 @@
+First time you get hit you get in a can't stop moving state first. Next hit you die.
+
