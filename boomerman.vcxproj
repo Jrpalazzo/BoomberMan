@@ -61,12 +61,14 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -80,8 +82,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\Joseph\Documents\C++ Projects\2D_Programming\boomer\SDL\SDL2_ttf-2.0.15\include;C:\Users\Joseph\Documents\C++ Projects\2D_Programming\boomer\SDL\SDL2-2.0.12\include;C:\Users\Joseph\Documents\C++ Projects\2D_Programming\boomer\SDL\SDL2_mixer-2.0.4\include;C:\Users\Joseph\Documents\C++ Projects\2D_Programming\boomer\SDL\SDL2_image-2.0.5\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files (x86)\Visual Leak Detector\include;C:\Users\Joseph\Documents\C++ Projects\2D_Programming\boomer\SDL\SDL2_mixer-2.0.4\lib\x86;C:\Users\Joseph\Documents\C++ Projects\2D_Programming\boomer\SDL\SDL2_ttf-2.0.15\lib\x86;C:\Users\Joseph\Documents\C++ Projects\2D_Programming\boomer\SDL\SDL2-2.0.12\lib\x86;C:\Users\Joseph\Documents\C++ Projects\2D_Programming\boomer\SDL\SDL2_image-2.0.5\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>E:\Users\Joseph\Documents\C++ Projects\2D_Programming\boomer\SDL\SDL2_ttf-2.0.15\include;E:\Users\Joseph\Documents\C++ Projects\2D_Programming\boomer\SDL\SDL2-2.0.12\include;E:\Users\Joseph\Documents\C++ Projects\2D_Programming\boomer\SDL\SDL2_mixer-2.0.4\include;E:\Users\Joseph\Documents\C++ Projects\2D_Programming\boomer\SDL\SDL2_image-2.0.5\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Visual Leak Detector\include;E:\Users\Joseph\Documents\C++ Projects\2D_Programming\boomer\SDL\SDL2_mixer-2.0.4\lib\x86;E:\Users\Joseph\Documents\C++ Projects\2D_Programming\boomer\SDL\SDL2_ttf-2.0.15\lib\x86;E:\Users\Joseph\Documents\C++ Projects\2D_Programming\boomer\SDL\SDL2-2.0.12\lib\x86;E:\Users\Joseph\Documents\C++ Projects\2D_Programming\boomer\SDL\SDL2_image-2.0.5\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>

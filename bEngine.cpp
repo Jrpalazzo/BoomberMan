@@ -8,6 +8,8 @@ Engine::Engine()
   newPlayer = Player(); 
   guitarFlag = false; 
   initalizeLevel = true;
+
+  playManager = new PlayManager();
 }
 
 Engine::~Engine() { }
@@ -46,7 +48,7 @@ bool Engine::initSDL()
 void Engine::closeSDL()
 {
 	//Destroy window	
-	playManager.free(); 
+	playManager->free(); 
 	SDL_DestroyRenderer( nRenderer );
 	window.free();
 	nRenderer = NULL;
@@ -107,10 +109,6 @@ void Engine::initWindow()
 				printf("SDL_mixer did not initialize. %s\n", Mix_GetError);
 			}
 		}
-
-		
-
-
 	}
 }
 
@@ -118,6 +116,7 @@ void Engine::initWindow()
 void Engine::update()
 {
 	capTimer.start();
+
 	/*
 	For levels:
 	create an enum - ie LEVEL1
@@ -125,15 +124,8 @@ void Engine::update()
 
 	*/
 	if(initalizeLevel){
-		playManager.loadMedia(window, nRenderer);
+		playManager->loadMedia(window, nRenderer);
 		initalizeLevel = false;	
-	}
-	else if(resetState)
-	{
-		//used so we can clear objects
-		playManager.free(); 
-		playManager.loadMedia(window, nRenderer);
-		resetState = false;
 	}
 
 	if(inputManager.mainInputs(runState, window.getWindow(), guitarFlag))
@@ -152,8 +144,8 @@ void Engine::update()
 			//std::cout<< "Average Frames Per Second (With Cap) " << avgFPS << std::endl; 
 			
 			//Clear screen
-			SDL_SetRenderDrawColor( nRenderer, 0, 120, 0, 0);
-			SDL_RenderClear(nRenderer);
+			//SDL_SetRenderDrawColor( nRenderer, 0, 120, 0, 0);
+			//SDL_RenderClear(nRenderer);
 
 			++countedFrames;
 
@@ -163,16 +155,39 @@ void Engine::update()
 
 			//	if(entityA == NULL || entityA == NULL) continue;
 
-		
 			//	newPlayer.checkCollision(entityA->getCollider());
 			//	
 			//	
 			//}
-			if(!resetState){
-				playManager.updateLevel(nRenderer, window, guitarFlag, resetState);
-			}
-		}
+		
+			//player state is stored as "dead" constantly
+			/////////////////////////////////////////////
+			//NEED TO DELETE GUITAR Keeps killing player
+			//REWORK createGuitar function 
+			//USE A COORDINATE MAP system instead 
 
+			/* x
+			   x 
+			 xxxx0 <- death at position (2,4) no rectangle collisions needed 
+			   x  
+			   x
+			*/ 
+			if (playManager->checkPlayerDeath())
+			{
+				playManager->free();
+				delete playManager;
+
+				playManager = new PlayManager();
+				playManager->loadMedia(window, nRenderer);
+
+				SDL_Delay(1000);
+			}
+			else
+			{
+				playManager->updateLevel(nRenderer, window, guitarFlag, resetState);
+			}
+			
+		}
 	}
 	else
 	{
@@ -180,9 +195,6 @@ void Engine::update()
 		running(runState);
 	}
 
-
-
 	updateFpsTimer();
-	
 }
 

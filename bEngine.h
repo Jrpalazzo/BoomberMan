@@ -53,7 +53,7 @@ class Engine
 
 		SDL_Renderer* nRenderer; 
 
-		PlayManager playManager; 
+		PlayManager* playManager; 
 
 		InputManager inputManager; 
 

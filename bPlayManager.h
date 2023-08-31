@@ -42,7 +42,9 @@ class PlayManager
 
 		void createGuitar(SDL_Renderer* nRenderer, bool &guitarFlag); 
 
-		bool checkPlayerDeath(Player &player);
+		void createExplosions(int curGuitarX, int curGuitarY);
+
+		bool checkPlayerDeath();
 
 		//bool checkBombCollsion(SDL_Renderer* nRenderer, std::vector<Explosion*> &explosions, Block *& block, SDL_Rect playerRect, bool &hasCollided); 
 

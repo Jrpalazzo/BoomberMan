@@ -28,8 +28,6 @@ Player::Player()
 	direction = NONE;
 
 	collided = false;
-
-	state = "alive";
 }
  
 Player::~Player() {}

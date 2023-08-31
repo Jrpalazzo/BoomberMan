@@ -118,7 +118,6 @@ void PlayManager::loadMedia(Window nWindow, SDL_Renderer* nRenderer)
 			explosions[i]->setY(0);
 	}
 
-	gMusic = NULL;
     initalized = false;
 	hasCollided = false;
 	srand(time(NULL)); 
@@ -148,7 +147,8 @@ void PlayManager::loadMedia(Window nWindow, SDL_Renderer* nRenderer)
 	newPlayer.setColliderX(64);
 	newPlayer.setColliderY(128);
 
-	//std::cout << nWindow.getWidth() << std::endl; 
+	newPlayer.setState("alive");
+
 }
 
 void PlayManager::drawHud(SDL_Renderer * renderer)
@@ -306,7 +306,7 @@ void PlayManager::generateMap(SDL_Renderer* nRenderer)
 
 	
 	
-	std::cout<< Map[0] << std::endl;
+	std::cout<< "Map " + Map[0] << std::endl;
 	
 	
 }
@@ -317,77 +317,68 @@ void PlayManager::updateLevel(SDL_Renderer* nRenderer, Window nWindow, bool &gui
 	SDL_SetRenderDrawColor( nRenderer, 0, 120, 0, 0);
 	SDL_RenderClear(nRenderer);
 	
+	drawHud(nRenderer);
+	hudTimer.render(nRenderer);
 
-	if(checkPlayerDeath(newPlayer))
+	//Show solid blocks
+	for( signed int i = 0; i < blocks.size(); ++i)
 	{
-		resetState = true;
-		newPlayer.setState("alive");
+		blocks[i]->render(nRenderer, camera); 
+		//blocks[i]->drawBlockCollision(nRenderer);
 	}
-	else
+
+	//pause timer to stop animation 
+	newPlayer.pauseAnimationTimer();
+
+	newPlayer.playerInput(keys,blocks, enemies, guitar.getCollider(), guitarFlag, guitar, explosionFlag, camera);
+
+	//if the player presses z create an instance of the guitar 
+	createGuitar(nRenderer, guitarFlag);
+
+	//display the enemies 
+
+	//move enemy and check collision 
+	for( signed int i = 0; i < enemies.size(); ++i)
 	{
-		drawHud(nRenderer);
-		hudTimer.render(nRenderer);
+		enemies[i]->move(blocks);
 
-		//Show solid blocks
-		for( signed int i = 0; i < blocks.size(); ++i)
-		{
-			blocks[i]->render(nRenderer, camera); 
-			//blocks[i]->drawBlockCollision(nRenderer);
-		}
+		enemies[i]->renderEnemy(nRenderer, camera);
+		//enemies[i]->drawEnemyCollision(nRenderer); 
+	}
 
-		//pause timer to stop animation 
-		newPlayer.pauseAnimationTimer();
-
-		newPlayer.playerInput(keys,blocks, enemies, guitar.getCollider(), guitarFlag, guitar, explosionFlag, camera);
-
-
-		//if the player presses z create an instance of the guitar 
-		createGuitar(nRenderer, guitarFlag);
-
-		//display the enemies 
-
-		//move enemy and check collision 
-		for( signed int i = 0; i < enemies.size(); ++i)
-		{
-			enemies[i]->move(blocks);
-
-			enemies[i]->renderEnemy(nRenderer, camera);
-			//enemies[i]->drawEnemyCollision(nRenderer); 
-		}
-
-		/*
-		for(int i = 0; i < explosions.size(); ++i)
-		{	
-			explosions[i]->drawExplosionCollision(nRenderer);	
+	/*
+	for(int i = 0; i < explosions.size(); ++i)
+	{	
+		explosions[i]->drawExplosionCollision(nRenderer);	
 					
-		}
-		*/
-
-
-		//enemies[0]->move(blocks);
-		//enemies[0]->renderEnemy(nRenderer, camera);
-		//enemies[0]->drawEnemyCollision(nRenderer); 
-
-		//render after since the guitar should be below the player
-		newPlayer.renderPlayer(nRenderer, camera); 
-
-		//newPlayer.drawPlayerCollision(nRenderer);
-
-
-		//Update screen
-		//render camera
-		setCamera(nWindow, camera, newPlayer.getX(), newPlayer.getY());
-
-		/*SDL_SetRenderDrawColor(nRenderer, 255,0,0,255);
-		SDL_RenderDrawRect(nRenderer, &camera); */ 
-
-		SDL_RenderPresent( nRenderer );
 	}
+	*/
+
+	//enemies[0]->move(blocks);
+	//enemies[0]->renderEnemy(nRenderer, camera);
+	//enemies[0]->drawEnemyCollision(nRenderer); 
+
+	//render after since the guitar should be below the player
+	newPlayer.renderPlayer(nRenderer, camera); 
+
+	//newPlayer.drawPlayerCollision(nRenderer);
+
+
+	//Update screen
+	//render camera
+	setCamera(nWindow, camera, newPlayer.getX(), newPlayer.getY());
+
+	/*SDL_SetRenderDrawColor(nRenderer, 255,0,0,255);
+	SDL_RenderDrawRect(nRenderer, &camera); */ 
+
+	SDL_RenderPresent( nRenderer );
 }
 
-bool PlayManager::checkPlayerDeath(Player &player)
+
+bool PlayManager::checkPlayerDeath()
 {
-	if(player.getState() == "dead")
+
+	if(newPlayer.getState() == "dead")
 	{
 		//std::cout<<player.getState()<<std::endl;
 		
@@ -398,11 +389,36 @@ bool PlayManager::checkPlayerDeath(Player &player)
 
 }
 
+void PlayManager::createExplosions(int curGuitarX, int curGuitarY)
+{
+	//turn this into a for loop algorithm 
+	explosions[0]->setX(curGuitarX);
+	explosions[0]->setY(curGuitarY);
+	explosions[0]->resetCollision();
+
+	explosions[1]->setX(curGuitarX);
+	explosions[1]->setY(curGuitarY + GRID_SIZE);
+	explosions[1]->resetCollision();
+
+	explosions[2]->setX(curGuitarX + GRID_SIZE);
+	explosions[2]->setY(curGuitarY);
+	explosions[2]->resetCollision();
+
+	explosions[3]->setX(curGuitarX - GRID_SIZE);
+	explosions[3]->setY(curGuitarY);
+	explosions[3]->resetCollision();
+
+	explosions[4]->setX(curGuitarX);
+	explosions[4]->setY(curGuitarY - GRID_SIZE);
+	explosions[4]->resetCollision();
+}
+
 void PlayManager::createGuitar(SDL_Renderer* nRenderer, bool &guitarFlag)
 {
-	//guitar.drawGuitarCollision(nRenderer);
+	guitar.drawGuitarCollision(nRenderer);
 
-	if(guitarFlag == false){
+	if(guitarFlag == false)
+	{
 		
 		if(explosionFlag == true){
 
@@ -412,57 +428,46 @@ void PlayManager::createGuitar(SDL_Renderer* nRenderer, bool &guitarFlag)
 			int curGuitarX = guitar.getX();
 			int curGuitarY = guitar.getY();
 
-			explosions[0]->setX(curGuitarX);
-			explosions[0]->setY(curGuitarY);
-			explosions[0]->resetCollision();
-
-			explosions[1]->setX(curGuitarX);
-			explosions[1]->setY(curGuitarY+GRID_SIZE);
-			explosions[1]->resetCollision();
-
-			explosions[2]->setX(curGuitarX+GRID_SIZE);
-			explosions[2]->setY(curGuitarY);
-			explosions[2]->resetCollision();
-
-			explosions[3]->setX(curGuitarX-GRID_SIZE);
-			explosions[3]->setY(curGuitarY);
-			explosions[3]->resetCollision();
-
-			explosions[4]->setX(curGuitarX);
-			explosions[4]->setY(curGuitarY-GRID_SIZE);
-			explosions[4]->resetCollision();
+			createExplosions(curGuitarX, curGuitarY);
 
 			for(int i = 0; i < blocks.size(); ++i)
 			{
 				for(int j = 0; j < explosions.size(); ++j )
 				{
-					if(SDL_HasIntersection(&explosions[j]->getCollider(), &newPlayer.getCollider()))
+					try
 					{
-						std::cout<<"yo"<<std::endl;
-						newPlayer.setState("dead");
-					}
-					else
-					{
-						for (int z=0; z<enemyCount; z++) 
-						{ 
-							if(SDL_HasIntersection(&explosions[j]->getCollider(), &enemies[z]->getCollider()))
+						if (SDL_HasIntersection(&explosions[j]->getCollider(), &newPlayer.getCollider()))
+						{
+							newPlayer.free();
+							newPlayer.setState("dead");
+							break;
+						}
+						else
+						{
+							for (int z = 0; z < enemyCount; z++)
 							{
+								if (SDL_HasIntersection(&explosions[j]->getCollider(), &enemies[z]->getCollider()))
+								{
 
-								 enemies.erase(enemies.begin()+z);
+									enemies.erase(enemies.begin() + z);
 
+								}
 							}
 						}
+
+						if (SDL_HasIntersection(&explosions[j]->getCollider(), &blocks[i]->getCollider()))
+						{
+							hasCollided = true;
+							explosions[j]->setCollided(hasCollided);
+
+							if (blocks[i]->getBlockType() == 2)
+								blocks.erase(blocks.begin() + i);
+						}
 					}
-					
-					if(SDL_HasIntersection(&explosions[j]->getCollider(), &blocks[i]->getCollider()))
+					catch (std::exception& e)
 					{
-						hasCollided = true; 
-						explosions[j]->setCollided(hasCollided);
-					
-						if(blocks[i]->getBlockType() == 2)
-							blocks.erase(blocks.begin()+i);
+						std::cout << e.what() << '\n';
 					}
-					
 				}
 				
 				
@@ -536,36 +541,25 @@ void PlayManager::setCamera(Window window, SDL_Rect& camera, int x, int y)
 	{
 		camera.y = LEVEL_HEIGHT - camera.h;
 	}
-
-
 }
 
 void PlayManager::musicManager()
 {
-	if( Mix_PlayingMusic() == 0 )
+	if (Mix_PlayingMusic() == 0)
 	{
-		//Mix_PlayMusic(gMusic, 0);
+		Mix_PlayMusic(gMusic, 0);
 	}
 }
 
 void PlayManager::free()
 {	
 	//Show solid blocks
-	for( signed int i = 0; i < blocks.size(); ++i)
-	{
-		blocks.clear();
-	}
 
-	for(int i = 0; i < explosions.size(); ++i){
-			explosions.clear();	
-	}
+	blocks.clear();
 
-	for( signed int i = 0; i < enemies.size(); ++i)
-	{
-		enemies.clear();
-	}
-
-	newPlayer.free();
+	explosions.clear();	
+	
+	enemies.clear();
 
 	tileTexture.free(); 
 	tileTexture2.free();
@@ -578,4 +572,6 @@ void PlayManager::free()
 
 	Mix_FreeMusic( gMusic );
 	gMusic = NULL;
+
+
 }
