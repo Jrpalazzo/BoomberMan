@@ -179,7 +179,6 @@ void Engine::update()
 
 				playManager = new PlayManager();
 				playManager->loadMedia(window, nRenderer);
-
 				SDL_Delay(1000);
 			}
 			else

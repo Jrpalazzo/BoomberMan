@@ -105,6 +105,7 @@ void PlayManager::loadMedia(Window nWindow, SDL_Renderer* nRenderer)
 		printf("Failed to load music. %s\n", Mix_GetError);
 	}
 
+
 	//Initialize particles
     for( int i = 0; i < TOTAL_PARTICLES; ++i )
     {
