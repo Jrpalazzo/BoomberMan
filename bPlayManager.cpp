@@ -9,7 +9,6 @@ Set the explosion renderer to play after there is a collison or not with a solid
 //Particle count
 const int GRID_SIZE = 64;
 
-const int TOTAL_PARTICLES = 9;
 const int MAP_TILES = 231;
 
 int SCREEN_WIDTH = 21;
@@ -29,9 +28,6 @@ int curPlayerX = 0;
 int curPlayerY = 0;
 int enemyCount = 6;
 
-//The particles
-Particle* particles[TOTAL_PARTICLES];
-
 PlayManager::PlayManager(){
 	
 }
@@ -47,6 +43,8 @@ void PlayManager::loadMedia(Window nWindow, SDL_Renderer* nRenderer)
 	}
 
 	//Load scene texture
+	guitar.initalizeParticles(nRenderer);
+
 	if( !tileTexture.loadFromFile(nRenderer, "graphics/tile1.png" ) )
 	{
 		printf( "Failed to load tile1 texture!\n" );
@@ -68,22 +66,6 @@ void PlayManager::loadMedia(Window nWindow, SDL_Renderer* nRenderer)
 		printf( "Failed to load player texture!\n" );
 	}
 	
-
-	if( !note1.loadFromFile(nRenderer,"graphics/note_1.png" ) )
-	{
-		printf( "Failed to load note1 texture!\n" );
-	}
-
-	if( !note2.loadFromFile(nRenderer,"graphics/note_2.png" ) )
-	{
-		printf( "Failed to load note2 texture!\n" );
-	}
-
-	if( !note3.loadFromFile(nRenderer,"graphics/note_3.png" ) )
-	{
-		printf( "Failed to load note3 texture!\n" );
-	}
-
 	if( !guitar.loadFromFile(nRenderer,"graphics/guitar_strip2.png" ) )
 	{
 		printf( "Failed to load guitar texture!\n" );
@@ -98,19 +80,6 @@ void PlayManager::loadMedia(Window nWindow, SDL_Renderer* nRenderer)
 	{
 		printf( "Failed to load enemy texture!\n" );
 	}
-
-	gMusic = Mix_LoadMUS("music/bomb_theme.wav");
-	if(gMusic == NULL)
-	{
-		printf("Failed to load music. %s\n", Mix_GetError);
-	}
-
-
-	//Initialize particles
-    for( int i = 0; i < TOTAL_PARTICLES; ++i )
-    {
-		particles[ i ] = new Particle(note1,note2,note3, guitar.getX(), guitar.getY() );
-    }
 
 	for(int i = 0; i < 5; ++i)
 	{
@@ -312,7 +281,7 @@ void PlayManager::generateMap(SDL_Renderer* nRenderer)
 	
 }
 
-void PlayManager::updateLevel(SDL_Renderer* nRenderer, Window nWindow, bool &guitarFlag, bool &resetState)
+void PlayManager::updateLevel(SDL_Renderer* nRenderer, Window nWindow, bool &resetState)
 {
 	//Clear screen
 	SDL_SetRenderDrawColor( nRenderer, 0, 120, 0, 0);
@@ -325,16 +294,13 @@ void PlayManager::updateLevel(SDL_Renderer* nRenderer, Window nWindow, bool &gui
 	for( signed int i = 0; i < blocks.size(); ++i)
 	{
 		blocks[i]->render(nRenderer, camera); 
-		//blocks[i]->drawBlockCollision(nRenderer);
+		blocks[i]->drawBlockCollision(nRenderer);
 	}
 
 	//pause timer to stop animation 
 	newPlayer.pauseAnimationTimer();
 
 	newPlayer.playerInput(keys,blocks, enemies, guitar.getCollider(), guitarFlag, guitar, explosionFlag, camera);
-
-	//if the player presses z create an instance of the guitar 
-	createGuitar(nRenderer, guitarFlag);
 
 	//display the enemies 
 
@@ -344,16 +310,16 @@ void PlayManager::updateLevel(SDL_Renderer* nRenderer, Window nWindow, bool &gui
 		enemies[i]->move(blocks);
 
 		enemies[i]->renderEnemy(nRenderer, camera);
-		//enemies[i]->drawEnemyCollision(nRenderer); 
+		enemies[i]->drawEnemyCollision(nRenderer); 
 	}
 
-	/*
+	
 	for(int i = 0; i < explosions.size(); ++i)
 	{	
 		explosions[i]->drawExplosionCollision(nRenderer);	
 					
 	}
-	*/
+	
 
 	//enemies[0]->move(blocks);
 	//enemies[0]->renderEnemy(nRenderer, camera);
@@ -362,15 +328,15 @@ void PlayManager::updateLevel(SDL_Renderer* nRenderer, Window nWindow, bool &gui
 	//render after since the guitar should be below the player
 	newPlayer.renderPlayer(nRenderer, camera); 
 
-	//newPlayer.drawPlayerCollision(nRenderer);
+	newPlayer.drawPlayerCollision(nRenderer);
 
 
 	//Update screen
 	//render camera
 	setCamera(nWindow, camera, newPlayer.getX(), newPlayer.getY());
 
-	/*SDL_SetRenderDrawColor(nRenderer, 255,0,0,255);
-	SDL_RenderDrawRect(nRenderer, &camera); */ 
+	SDL_SetRenderDrawColor(nRenderer, 255,0,0,255);
+	SDL_RenderDrawRect(nRenderer, &camera); 
 
 	SDL_RenderPresent( nRenderer );
 }
@@ -414,111 +380,6 @@ void PlayManager::createExplosions(int curGuitarX, int curGuitarY)
 	explosions[4]->resetCollision();
 }
 
-void PlayManager::createGuitar(SDL_Renderer* nRenderer, bool &guitarFlag)
-{
-	guitar.drawGuitarCollision(nRenderer);
-
-	if(guitarFlag == false)
-	{
-		
-		if(explosionFlag == true){
-
-			guitar.setColliderX(0);
-			guitar.setColliderY(0);
-
-			int curGuitarX = guitar.getX();
-			int curGuitarY = guitar.getY();
-
-			createExplosions(curGuitarX, curGuitarY);
-
-			for(int i = 0; i < blocks.size(); ++i)
-			{
-				for(int j = 0; j < explosions.size(); ++j )
-				{
-					try
-					{
-						if (SDL_HasIntersection(&explosions[j]->getCollider(), &newPlayer.getCollider()))
-						{
-							newPlayer.free();
-							newPlayer.setState("dead");
-							break;
-						}
-						else
-						{
-							for (int z = 0; z < enemyCount; z++)
-							{
-								if (SDL_HasIntersection(&explosions[j]->getCollider(), &enemies[z]->getCollider()))
-								{
-
-									enemies.erase(enemies.begin() + z);
-
-								}
-							}
-						}
-
-						if (SDL_HasIntersection(&explosions[j]->getCollider(), &blocks[i]->getCollider()))
-						{
-							hasCollided = true;
-							explosions[j]->setCollided(hasCollided);
-
-							if (blocks[i]->getBlockType() == 2)
-								blocks.erase(blocks.begin() + i);
-						}
-					}
-					catch (std::exception& e)
-					{
-						std::cout << e.what() << '\n';
-					}
-				}
-				
-				
-			}
-
-			    for(int i = 0; i < explosions.size(); ++i)
-				{	
-					explosions[i]->renderExplosion(nRenderer, explosionFlag, camera);	
-					explosions[i]->setX(0);
-					explosions[i]->setY(0);
-			    }
-
-				//set the guitar to the origin for the next keypress
-				
-		}
-		Mix_HaltMusic();
-
-	}
-	else 
-	{
-		guitar.renderGuitar(nRenderer, guitarFlag, camera); 
-		
-		//Go through particles
-		for( int i = 0; i < TOTAL_PARTICLES; ++i )
-		{
-			//Delete and replace dead particles
-			if( particles[ i ]->isDead() )
-			{
-				delete particles[ i ];
-
-				int posX = guitar.getX();
-				int posY = guitar.getY();
-
-				particles[ i ] = new Particle(note1,note2,note3, posX++ , posY++);
-			}
-		}
-
-		musicManager();
-
-		//Show particles
-		for( int i = 0; i < TOTAL_PARTICLES; ++i )
-		{
-			particles[ i ]->render(nRenderer, camera);
-		}
-	}
-
-
-}
-
-
 void PlayManager::setCamera(Window window, SDL_Rect& camera, int x, int y)
 {
 	//Center the camera over the player
@@ -546,10 +407,7 @@ void PlayManager::setCamera(Window window, SDL_Rect& camera, int x, int y)
 
 void PlayManager::musicManager()
 {
-	if (Mix_PlayingMusic() == 0)
-	{
-		Mix_PlayMusic(gMusic, 0);
-	}
+	
 }
 
 void PlayManager::free()
@@ -566,13 +424,6 @@ void PlayManager::free()
 	tileTexture2.free();
 	tileTexture3.free();
 
-	note1.free();
-	note2.free();
-	note3.free();
 	guitar.free();
-
-	Mix_FreeMusic( gMusic );
-	gMusic = NULL;
-
 
 }

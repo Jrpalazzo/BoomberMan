@@ -7,7 +7,6 @@
 #include "bWindow.h"
 #include "bTexture.h"
 #include "bPlayer.h"
-#include "bParticle.h"
 #include "bGuitar.h"
 #include "bInputManager.h"
 #include "bExplosion.h"
@@ -30,7 +29,7 @@ class PlayManager
 
 		void loadMedia(Window nWindow, SDL_Renderer* nRenderer);
 
-		void updateLevel(SDL_Renderer* nRenderer, Window nWindow, bool &guitarFlag, bool &resetState);
+		void updateLevel(SDL_Renderer* nRenderer, Window nWindow, bool &resetState);
 
 		void generateMap(SDL_Renderer* nRenderer);
 
@@ -39,8 +38,6 @@ class PlayManager
 		void musicManager(); 
 
 		void drawHud(SDL_Renderer* nRenderer);
-
-		void createGuitar(SDL_Renderer* nRenderer, bool &guitarFlag); 
 
 		void createExplosions(int curGuitarX, int curGuitarY);
 
@@ -53,7 +50,6 @@ class PlayManager
 		void setCamera(Window window, SDL_Rect& camera, int x, int y);
 
 	private:
-		Mix_Music *gMusic;
 		bool initalized;
 		bool hasCollided;
 
@@ -80,9 +76,6 @@ class PlayManager
 		Texture explosionTexture; 
 		Texture guitarTexture;
 		Texture enemy1Texture; 
-		Texture note1;
-		Texture note2;
-		Texture note3;
 
 		GameText hudTimer;
 		Explosion *explosion; 

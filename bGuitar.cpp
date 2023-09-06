@@ -2,7 +2,6 @@
 
 Guitar::Guitar()
 {
-
 	animationCounter = 0;
 	setAnimationClips(); 
 	mCollider.w = Width-4;
@@ -12,10 +11,142 @@ Guitar::Guitar()
 	mCollider.x = X;
 	mCollider.y = Y;
 
+	gMusic = Mix_LoadMUS("music/bomb_theme.wav");
+	if (gMusic == NULL)
+	{
+		printf("Failed to load music. %s\n", Mix_GetError);
+	}
 }
 
 Guitar::~Guitar()
 {
+	note1.free();
+	note2.free();
+	note3.free();
+
+	Mix_FreeMusic(gMusic);
+	gMusic = NULL;
+
+}
+
+void Guitar::create(SDL_Renderer* nRenderer, SDL_Rect& camera)
+{
+	drawGuitarCollision(nRenderer);
+
+	/*
+	if(explosionFlag == true){
+
+		guitar.setColliderX(0);
+		guitar.setColliderY(0);
+
+		int curGuitarX = guitar.getX();
+		int curGuitarY = guitar.getY();
+
+		createExplosions(curGuitarX, curGuitarY);
+
+		for(int i = 0; i < blocks.size(); ++i)
+		{
+			for(int j = 0; j < explosions.size(); ++j )
+			{
+				try
+				{
+					if (SDL_HasIntersection(&explosions[j]->getCollider(), &newPlayer.getCollider()))
+					{
+						newPlayer.free();
+						newPlayer.setState("dead");
+						break;
+					}
+					else
+					{
+						for (int z = 0; z < enemyCount; z++)
+						{
+							if (SDL_HasIntersection(&explosions[j]->getCollider(), &enemies[z]->getCollider()))
+							{
+
+								enemies.erase(enemies.begin() + z);
+
+							}
+						}
+					}
+
+					if (SDL_HasIntersection(&explosions[j]->getCollider(), &blocks[i]->getCollider()))
+					{
+						hasCollided = true;
+						explosions[j]->setCollided(hasCollided);
+
+						if (blocks[i]->getBlockType() == 2)
+							blocks.erase(blocks.begin() + i);
+					}
+				}
+				catch (std::exception& e)
+				{
+					std::cout << e.what() << '\n';
+				}
+			}
+
+
+		}
+
+		for(int i = 0; i < explosions.size(); ++i)
+		{
+			explosions[i]->renderExplosion(nRenderer, explosionFlag, camera);
+			explosions[i]->setX(0);
+			explosions[i]->setY(0);
+		}
+
+		//set the guitar to the origin for the next keypress
+
+	}
+	Mix_HaltMusic();
+	*/
+
+	renderGuitar(nRenderer, camera);
+
+	//Go through particles
+	for (int i = 0; i < TOTAL_PARTICLES; ++i)
+	{
+		//Delete and replace dead particles
+		if (particles[i]->isDead())
+		{
+			delete particles[i];
+
+			particles[i] = new Particle(note1, note2, note3, X++, Y++);
+		}
+	}
+
+	playMusic();
+
+	//Show particles
+	for (int i = 0; i < TOTAL_PARTICLES; ++i)
+	{
+		particles[i]->render(nRenderer, camera);
+	}
+
+}
+
+void Guitar::initalizeParticles(SDL_Renderer* nRenderer)
+{
+	if (!note1.loadFromFile(nRenderer, "graphics/note_1.png"))
+	{
+		printf("Failed to load note1 texture!\n");
+	}
+
+	if (!note2.loadFromFile(nRenderer, "graphics/note_2.png"))
+	{
+		printf("Failed to load note2 texture!\n");
+	}
+
+	if (!note3.loadFromFile(nRenderer, "graphics/note_3.png"))
+	{
+		printf("Failed to load note3 texture!\n");
+	}
+
+	//Initialize particles
+	for (int i = 0; i < TOTAL_PARTICLES; ++i)
+	{
+		particles[i] = new Particle(note1, note2, note3, mCollider.x, mCollider.y);
+	}
+
 }
 
 void Guitar::setAnimationClips()
@@ -82,7 +213,7 @@ void Guitar::setAnimationClips()
 	bSpriteClips[ 11 ].h =  64;	
 }
 
-void Guitar::renderGuitar(SDL_Renderer* nRenderer, bool &guitarFlag, SDL_Rect& camera)
+void Guitar::renderGuitar(SDL_Renderer* nRenderer, SDL_Rect& camera)
 {
 	mCollider.x = X;
 	mCollider.y = Y;
@@ -106,7 +237,7 @@ void Guitar::renderGuitar(SDL_Renderer* nRenderer, bool &guitarFlag, SDL_Rect& c
 	//renders the spritesheet pointing to guitar
 	this->render( nRenderer, X-camera.x, Y-camera.y, currentClip);
 
-	if(guitarFlag == true && !guitarTimer.isStarted())
+	if(!guitarTimer.isStarted())
 	{
 		guitarTimer.start();
 	}
@@ -118,6 +249,14 @@ void Guitar::renderGuitar(SDL_Renderer* nRenderer, bool &guitarFlag, SDL_Rect& c
 	}
 
 	//std::cout << "guitarFlag " << guitarFlag << " animationTimer " << animationTimer << " guitarX " << X << " guitarY " << Y <<std::endl;
+}
+
+void Guitar::playMusic()
+{
+	if (Mix_PlayingMusic() == 0)
+	{
+		Mix_PlayMusic(gMusic, 0);
+	}
 }
 
 void Guitar::drawGuitarCollision(SDL_Renderer* nRenderer)

@@ -183,7 +183,7 @@ void Engine::update()
 			}
 			else
 			{
-				playManager->updateLevel(nRenderer, window, guitarFlag, resetState);
+				playManager->updateLevel(nRenderer, window, resetState);
 			}
 			
 		}
